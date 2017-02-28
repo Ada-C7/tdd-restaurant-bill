@@ -1,10 +1,10 @@
 class RestaurantBill
-  attr_reader :ordered_items, :total
+  attr_reader :ordered_items, :total, :tip
 
   def initialize
     @ordered_items = []
-    @total
-    @tip
+    @total = 0.0
+    @tip = 0
   end
 
   def order_item(item, cost)
@@ -17,18 +17,20 @@ class RestaurantBill
       total += item[1]
     end
 
-    total_with_tax = add_tax(total)
-  end
-
-  def add_tax(price)
-    tax = price * 0.057
-    total = price + tax
-    @total = (total * 100).round / 100.0
+    @total = total_with_tax = add_tax(total)
   end
 
   def add_tip(tip)
     @tip = tip
     @total += tip
+  end
+
+  private
+
+  def add_tax(price)
+    tax = price * 0.057
+    total = price + tax
+    total.round(2)
   end
 
 end

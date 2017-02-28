@@ -3,48 +3,93 @@ require 'minitest/reporters'
 require 'minitest/skip_dsl'
 require_relative '../lib/restaurant_bill'
 
+describe "Testing RestaurantBill Class" do
+  describe "Create new instance of RestaurantBill Class" do
+    it "New instance of RestaurantBill is created" do
+      bill = RestaurantBill.new
+      bill.class.must_equal RestaurantBill
+    end
 
-describe 'Test restaurant_bill' do
+    it "RestaurantBill initializes no ordered items" do
+      bill = RestaurantBill.new
+      bill.ordered_items.must_be_empty
+    end
 
-  it "Can create an instance of RestaurantBill" do
-    bill = RestaurantBill.new
-
-    bill.class.must_equal RestaurantBill
+    it "RestaurantBill stores orded items in an array" do
+      bill = RestaurantBill.new
+      bill.ordered_items.class.must_equal Array
+    end
   end
 
-  it "Bill initializes with no ordered items" do
-    bill = RestaurantBill.new
+  describe "Order Item Method" do
 
-    bill.ordered_items.must_be_empty
+    it "Order item adds item to ordered items list" do
+      bill = RestaurantBill.new
+      bill.order_item("Pancakes", 7)
+
+      bill.ordered_items.wont_be_empty
+    end
+
+    it "Order item adds one element to ordered items list" do
+      bill = RestaurantBill.new
+      bill.order_item("Pancakes", 7)
+
+      bill.ordered_items.length.must_equal 1
+    end
+
+    it "When order items is called 3 times, ordered items has 3 elements" do
+      bill = RestaurantBill.new
+      bill.order_item("Pancakes", 7)
+      bill.order_item("Coffee", 3)
+      bill.order_item("Bacon", 3)
+
+      bill.ordered_items.length.must_equal 3
+    end
   end
 
-  it "Bill has one item, after ordering" do
+  it "See total cost of all items with tax" do
     bill = RestaurantBill.new
-    bill.order_item("Waffles", 5)
+    bill.order_item("Pancakes", 7)
+    bill.order_item("Coffee", 3)
+    bill.order_item("Bacon", 3)
 
-    bill.ordered_items.length.must_equal 1
+    item_total = 7 + 3 + 3
+    tax = item_total * 0.057
+    final_total = (item_total + tax).round(2)
+
+    bill.item_total.must_equal final_total
   end
 
-  it "Bill has total cost of items, with tax" do
-    bill = RestaurantBill.new
-    bill.order_item("Waffles", 5)
-    bill.order_item("Juice", 2)
-    bill.order_item("Fruit", 4)
 
-    bill.item_total.must_equal 11.63
-  end
-
-  it "Adds tip to total bill" do
+  it "Tipping is added to total cost" do
     bill = RestaurantBill.new
-    bill.order_item("Waffles", 5)
+    bill.order_item("Pancakes", 7)
+    bill.order_item("Coffee", 3)
+    bill.order_item("Bacon", 3)
+
     bill.item_total
-    bill.add_tip(2)
+    tip = 2
+    bill.add_tip(tip)
 
-    bill.total.must_equal 7.29
+    item_total = 7 + 3 + 3
+    tax = item_total * 0.057
+    final_total = (item_total + tax).round(2)
+    final_total_with_tip = final_total + tip
+
+
+    bill.total.must_equal final_total_with_tip
   end
+
+  it "RestaurantBill has tip, total and ordered_items attributes" do
+    bill = RestaurantBill.new
+
+    proc {
+      bill.total
+      bill.tip
+      bill.ordered_items
+    }.must_be_silent
+
+  end
+
+
 end
-
-
-# What are other tests that could be added?
-  # - Check that tip wouldn't take a negative sum
-  # -
